@@ -7,9 +7,27 @@ import random
 import re
 
 app = Flask(__name__)
-CORS(app)
 
-# Configurez votre API Key
+
+# Enable CORS with OPTIONS handling
+CORS(app, resources={
+    r"/generate_questions/*": {
+        "origins": "http://localhost:5173",
+        "methods": ["OPTIONS", "POST"],  # Explicitly allow OPTIONS
+        "allow_headers": ["Content-Type"],
+        "supports_credentials": True
+    },
+     r"/validate_answer": {  # Nouvelle configuration
+        "origins": "http://localhost:5173",
+        "methods": ["OPTIONS", "POST"],
+        "allow_headers": ["Content-Type"],
+        "supports_credentials": True
+    }
+})
+
+
+def handle_options():
+    return jsonify({}), 200
 genai.configure(api_key="AIzaSyCAmDVW5ETCqhc-aoxsUHELM9AHmyTZx5E")  
 
 class InterviewGenerator:

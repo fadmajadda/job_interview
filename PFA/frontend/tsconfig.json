@@ -2,16 +2,13 @@
   "compilerOptions": {
     "moduleResolution": "nodenext",
     "target": "es2020",
-    "module": "es2020",
+    "module": "NodeNext",
     "esModuleInterop": true,
 
     "allowImportingTsExtensions": true,
+    "noEmit": true,
     "forceConsistentCasingInFileNames": true,
-    "include": [
-      "src/**/*.ts",
-      "src/**/*.vue",
-      "src/**/*.d.ts"
-    ],
+    
     "baseUrl": ".",
     "paths": {
       "@/*": [
@@ -19,5 +16,10 @@
       ]
     },
     "skipLibCheck": true
-  }
+  },
+  "include": [
+      "src/**/*.ts",
+      "src/**/*.vue",
+      "src/**/*.d.ts"
+    ],
 }

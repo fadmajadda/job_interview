@@ -7,7 +7,8 @@ const generateQuizzQuestions = async (form: QuestionForm) => {
     try {
         return await Api().post(endpoints.GENERATE_QUESTIONS, form);
     } catch (err) {
-        return Promise.reject(err);
+       // Transforme les erreurs Axios en erreurs lisibles
+         throw new Error(err.response?.data?.message || "Échec de la génération des questions");
     }
 }
 

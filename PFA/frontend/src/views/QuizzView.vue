@@ -1,13 +1,14 @@
 <script setup>
-import {ref, computed, watch} from 'vue'
-import ErrorMessage from "@/components/quizz/ErrorMessage.vue";
-import QuizzHeader from "@/components/quizz/QuizzHeader.vue";
-import QuizzResult from "@/components/quizz/QuizzResult.vue";
-import QuizzForm from "@/components/quizz/QuizzForm.vue";
-import {generateQuizzQuestions} from "@/services/quizz_service.js";
+import { ref, computed, nextTick } from 'vue'
 
-// State
-const jobDescription = ref('');
+import QuizzHeader from "@/components/quizz/QuizzHeader.vue"
+import QuizzResult from "@/components/quizz/QuizzResult.vue"
+import QuizzForm from "@/components/quizz/QuizzForm.vue"
+import { generateQuizzQuestions } from "@/services/quizz_service.js"
+import { validate_answer } from "@/services/answer_services.js"
+
+// ===== STATE =====
+const jobDescription = ref('')
 const questionCount = ref(15)
 const questionFormat = ref('qcm')
 const questions = ref([])
@@ -18,23 +19,26 @@ const isLoading = ref(false)
 const error = ref(null)
 const techData = ref(null)
 
+// Open-ended question state
 const userAnswer = ref('')
 const isAnswerCorrect = ref(false)
 const answerScore = ref(0)
 const answerFeedback = ref('')
 const isCheckingAnswer = ref(false)
 
-// Computed
+// ===== COMPUTED PROPERTIES =====
 const currentQuestion = computed(() => questions.value[currentQuestionIndex.value] || null)
 const progress = computed(() =>
-    questions.value.length > 0
-        ? Math.round((currentQuestionIndex.value + 1) / questions.value.length * 100)
-        : 0
+  questions.value.length > 0
+    ? Math.round((currentQuestionIndex.value + 1) / questions.value.length * 100)
+    : 0
 )
 const isFirstQuestion = computed(() => currentQuestionIndex.value === 0)
 const isLastQuestion = computed(() => currentQuestionIndex.value === questions.value.length - 1)
 
-// Methods
+// ===== METHODS =====
+
+// Quiz Generation
 async function generateQuestions() {
   if (!jobDescription.value.trim()) {
     error.value = "Veuillez entrer une offre d'emploi"
@@ -52,22 +56,20 @@ async function generateQuestions() {
 
   try {
     const response = await generateQuizzQuestions({
-        job_description: jobDescription.value,
-        question_count: questionCount.value,
-        question_format: questionFormat.value
-      })
+      job_description: jobDescription.value,
+      question_count: questionCount.value,
+      question_format: questionFormat.value
+    })
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      new Error(errorData.message || 'Erreur lors de la génération des questions')
+    if (!response.data) {
+      throw new Error('Aucune donnée reçue du serveur')
     }
-
-    const data = await response.json()
+    
     questions.value = questionFormat.value === 'qcm'
-        ? randomizeCorrectAnswers(data.questions)
-        : data.questions
+      ? randomizeCorrectAnswers(response.data.questions)
+      : response.data.questions
 
-    techData.value = data.tech_data
+    techData.value = response.data.tech_data
     resetQuestionState()
   } catch (err) {
     error.value = err.message || 'Une erreur est survenue'
@@ -77,38 +79,38 @@ async function generateQuestions() {
   }
 }
 
+// Answer Validation
+// Answer Validation
 async function validateAnswer() {
-  if (!userAnswer.value.trim()) return
+  if (!userAnswer.value.trim()) return;
 
-  isCheckingAnswer.value = true
+  isCheckingAnswer.value = true;
 
   try {
-    const response = await fetch('http://localhost:5000/validate_answer', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        question: currentQuestion.value,
-        user_answer: userAnswer.value
-      })
-    })
+    const response = await validate_answer({
+      question: currentQuestion.value,
+      user_answer: userAnswer.value
+    });
 
-    if (!response.ok)  new Error('Erreur lors de la validation')
+    if (!response.data) {
+      throw new Error('Erreur lors de la validation de la réponse');
+    }
 
-    const result = await response.json()
-    isAnswerCorrect.value = result.is_correct
-    answerScore.value = result.score
-    answerFeedback.value = result.feedback || result.explanation
-    answerChecked.value = true
+    isAnswerCorrect.value = response.data.is_correct;
+    answerScore.value = response.data.score;
+    answerFeedback.value = response.data.feedback || response.data.explanation;
+    answerChecked.value = true;
   } catch (error) {
-    console.error("Validation error:", error)
-    isAnswerCorrect.value = false
-    answerFeedback.value = "Erreur lors de la validation"
-    answerScore.value = 0
+    console.error("Validation error:", error);
+    isAnswerCorrect.value = false;
+    answerFeedback.value = "Erreur lors de la validation";
+    answerScore.value = 0;
   } finally {
-    isCheckingAnswer.value = false
+    isCheckingAnswer.value = false;
   }
 }
 
+// Helper Functions
 function randomizeCorrectAnswers(inputQuestions) {
   return inputQuestions.map(question => {
     const correctOption = question.options.find(opt => opt.correct)
@@ -135,6 +137,7 @@ function shuffleArray(array) {
   return array
 }
 
+// Quiz Navigation
 function checkAnswer() {
   if (selectedOption.value !== null) {
     answerChecked.value = true
@@ -173,6 +176,7 @@ function resetQuiz() {
   resetQuestionState()
 }
 
+// UI Helpers
 function scrollToExplanation() {
   nextTick(() => {
     const explanation = document.querySelector('.explanation')
@@ -192,93 +196,51 @@ function scrollToTop() {
 }
 </script>
 
-
 <template>
-  <div class="main-container ">
-    <div class="container">
-      <QuizzHeader/>
-      <main>
+  <div class="quiz-generator">
+    <div class="quiz-container">
+      <QuizzHeader />
+      
+      <main class="quiz-content">
         <QuizzForm
-            v-model:description="jobDescription"
-            v-model:count="questionCount"
-            v-model:format="questionFormat"
-            :isLoading="isLoading"
-            :questions="questions"
-            :techData="techData"
-            @update:count="questionCount = $event"
-            @update:format="questionFormat = $event"
-            @generate="generateQuestions"
+          v-model:description="jobDescription"
+          v-model:count="questionCount"
+          v-model:format="questionFormat"
+          :isLoading="isLoading"
+          :questions="questions"
+          :techData="techData"
+          @update:count="questionCount = $event"
+          @update:format="questionFormat = $event"
+          @generate="generateQuestions"
         />
 
         <QuizzResult
-            :questions="questions"
-            :currentIndex="currentQuestionIndex"
-            :format="questionFormat"
-            v-model:selected="selectedOption"
-            :answerChecked="answerChecked"
-            :isAnswerCorrect="isAnswerCorrect"
-            :answerScore="answerScore"
-            :answerFeedback="answerFeedback"
-            v-model:userAnswer="userAnswer"
-            :isCheckingAnswer="isCheckingAnswer"
-            :progress="progress"
-            :isFirst="isFirstQuestion"
-            :isLast="isLastQuestion"
-            @check-answer="checkAnswer"
-            @validate-answer="validateAnswer"
-            @prev-question="prevQuestion"
-            @next-question="nextQuestion"
-            @reset-quiz="resetQuiz"
+          :questions="questions"
+          :currentIndex="currentQuestionIndex"
+          :format="questionFormat"
+          v-model:selected="selectedOption"
+          :answerChecked="answerChecked"
+          :isAnswerCorrect="isAnswerCorrect"
+          :answerScore="answerScore"
+          :answerFeedback="answerFeedback"
+          v-model:userAnswer="userAnswer"
+          :isCheckingAnswer="isCheckingAnswer"
+          :progress="progress"
+          :isFirst="isFirstQuestion"
+          :isLast="isLastQuestion"
+          @check-answer="checkAnswer"
+          @validate-answer="validateAnswer"
+          @prev-question="prevQuestion"
+          @next-question="nextQuestion"
+          @reset-quiz="resetQuiz"
         />
 
-        <ErrorMessage :error="error"/>
+       
       </main>
     </div>
   </div>
 </template>
 
 <style scoped>
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-.main-container {
-  max-width: 1380px;
-  margin: 0 auto;
-
-}
-
-/* Conteneur principal */
-.container {
-  width: 100%;
-  padding: 2rem;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-
-/* Layout principal */
-main {
-  display: flex;
-  gap: 2rem;
-  align-items: flex-start;
-  width: 100%;
-  margin-top: 2rem;
-}
-
-
-.navigation-buttons button {
-  flex: 1;
-  min-width: 120px;
-}
-
-
-
-
-
-
-
+@import './src/styles/quizz_view_style.css';
 </style>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 defineProps<{
-  error: string;
+  error: string | null;  // Accept both string and null
 }>()
 
 
