@@ -1,0 +1,63 @@
+# ==========================
+# Project Root Level
+# ==========================
+.env
+.env.local
+.env.*.local
+*.env
+# IDE/Editor specific files
+*.vscode/*             # VS Code specific files
+*.idea/*               # IntelliJ/PyCharm specific files
+*.sublime-project
+*.sublime-workspace
+.DS_Store            # macOS system files
+Thumbs.db            # Windows thumbnail cache
+
+# ==========================
+# Backend (Flask/Python)
+# ==========================
+/backend/__pycache__/ # Python bytecode cache
+/backend/*.pyc        # Compiled Python files
+/backend/*.o          # Compiled object files (if any C extensions)
+/backend/venv/        # Python virtual environment (if used)
+/backend/env/         # Another common name for virtual environment
+/backend/.pytest_cache/ # pytest cache
+/backend/.coverage    # Coverage report files
+
+# ==========================
+# Frontend (Vue/Vite) - Copied from your existing frontend/.gitignore
+# ==========================
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules            # <--- This rule was in your frontend/.gitignore, but should be specific to /frontend/
+/frontend/node_modules/ # Corrected to ensure it only applies to the frontend
+
+dist                    # <--- This rule was in your frontend/.gitignore, but should be specific to /frontend/
+/frontend/dist/         # Corrected to ensure it only applies to the frontend
+
+dist-ssr
+coverage
+/PFA/node_modules       # This path is redundant if /frontend/node_modules/ is already covered, and generally incorrect for a root .gitignore
+/cypress/videos/
+/cypress/screenshots/
+
+**/node_modules/clea
+
+# Editor directories and files (already covered at root, but good to double check consistency)
+# .vscode/* # Already handled at root
+# !.vscode/extensions.json # Already handled at root
+# .idea                # Already handled at root
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+*.tsbuildinfo
