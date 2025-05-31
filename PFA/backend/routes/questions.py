@@ -14,7 +14,7 @@ def generate_questions_route():
     if not job_description:
         return jsonify({"error": "Aucune offre d'emploi fournie"}), 400
     
-    if question_count < 5 or question_count > 30:
+    if question_count < 2 or question_count > 30:
         return jsonify({"error": "Le nombre de questions doit être entre 5 et 30"}), 400
     
     if question_format not in ['qcm', 'qa']:

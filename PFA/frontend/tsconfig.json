@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "types": ["vite/client"],
     "moduleResolution": "nodenext",
     "target": "es2020",
     "module": "NodeNext",

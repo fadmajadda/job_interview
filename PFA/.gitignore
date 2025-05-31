@@ -4,10 +4,12 @@
 .env
 .env.local
 .env.*.local
+backend/.env
+frontend/.env
 *.env
 # IDE/Editor specific files
-*.vscode/*             # VS Code specific files
-*.idea/*               # IntelliJ/PyCharm specific files
+**/.idea/
+**/.vscode/
 *.sublime-project
 *.sublime-workspace
 .DS_Store            # macOS system files
@@ -36,8 +38,7 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules            # <--- This rule was in your frontend/.gitignore, but should be specific to /frontend/
-/frontend/node_modules/ # Corrected to ensure it only applies to the frontend
+**/node_modules/
 
 dist                    # <--- This rule was in your frontend/.gitignore, but should be specific to /frontend/
 /frontend/dist/         # Corrected to ensure it only applies to the frontend

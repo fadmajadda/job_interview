@@ -4,7 +4,8 @@ from typing import Dict, List
 import random
 import re
 
-genai.configure(api_key="AIzaSyCAmDVW5ETCqhc-aoxsUHELM9AHmyTZx5E")
+genai.configure(api_key="AIzaSyCsq7zYHYPHCBMaJ9pHSMnhmRFw3mcC2MQ")
+# genai.configure(api_key="AIzaSyCAmDVW5ETCqhc-aoxsUHELM9AHmyTZx5E")
 
 class InterviewGenerator:
     def __init__(self):

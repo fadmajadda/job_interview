@@ -11,6 +11,8 @@ import { validate_answer } from "@/services/answer_services.js"
 const jobDescription = ref('')
 const questionCount = ref(15)
 const questionFormat = ref('qcm')
+
+
 const questions = ref([])
 const currentQuestionIndex = ref(0)
 const selectedOption = ref(null)
@@ -44,8 +46,8 @@ async function generateQuestions() {
     error.value = "Veuillez entrer une offre d'emploi"
     return
   }
-  if (questionCount.value < 5 || questionCount.value > 30) {
-    error.value = "Veuillez entrer un nombre entre 5 et 30"
+  if (questionCount.value < 2 || questionCount.value > 30) {
+    error.value = "Veuillez entrer un nombre entre 2 et 30"
     return
   }
 
@@ -242,5 +244,5 @@ function scrollToTop() {
 </template>
 
 <style scoped>
-@import './src/styles/quizz_view_style.css';
+
 </style>

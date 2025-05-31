@@ -41,8 +41,8 @@ const errorDescription = computed(() => {
     : ''
 })
 const errorCount = computed(() => {
-  return count.value < 5 || count.value > 30
-    ? 'Le nombre de questions doit être entre 5 et 30'
+  return count.value < 2 || count.value > 30
+    ? 'Le nombre de questions doit être entre 2 et 30'
     : ''
 })
 
