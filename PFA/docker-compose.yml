@@ -14,7 +14,7 @@ services:
     container_name: vue_frontend
     restart: always
     ports:
-      - "3000:80"
+      - "3030:80"
     depends_on:
       - flask_api
     networks:
