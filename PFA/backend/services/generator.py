@@ -3,14 +3,18 @@ import json
 from typing import Dict, List
 import random
 import re
+from dotenv import load_dotenv
+import os
 
-genai.configure(api_key="AIzaSyCsq7zYHYPHCBMaJ9pHSMnhmRFw3mcC2MQ")
+load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
+
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 # genai.configure(api_key="AIzaSyCAmDVW5ETCqhc-aoxsUHELM9AHmyTZx5E")
 
 class InterviewGenerator:
     def __init__(self):
-        self.extraction_model = genai.GenerativeModel('gemini-1.5-flash')
-        self.generation_model = genai.GenerativeModel('gemini-1.5-pro')
+        self.extraction_model = genai.GenerativeModel('gemini-2.0-flash')
+        self.generation_model = genai.GenerativeModel('gemini-2.0-pro')
         self.language_map = {
             'fr': 'french',
             'en': 'english',
